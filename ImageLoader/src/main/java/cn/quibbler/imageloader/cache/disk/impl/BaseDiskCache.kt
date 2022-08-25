@@ -5,6 +5,7 @@ import cn.quibbler.imageloader.cache.disk.DiskCache
 import cn.quibbler.imageloader.cache.disk.naming.FileNameGenerator
 import cn.quibbler.imageloader.core.DefaultConfigurationFactory
 import cn.quibbler.imageloader.utils.CopyListener
+import cn.quibbler.imageloader.utils.closeSilently
 import cn.quibbler.imageloader.utils.copyStream
 import java.io.*
 import java.util.*
@@ -54,8 +55,8 @@ class BaseDiskCache : DiskCache {
 
     override fun save(
         imageUrl: String,
-        imageStream: InputStream?,
-        listener: CopyListener?
+        imageStream: InputStream,
+        listener: CopyListener
     ): Boolean {
         val imageFile: File = getFile(imageUrl)
         val tmpFile: File = File(imageFile.absolutePath + TEMP_IMAGE_POSTFIX)
@@ -64,19 +65,39 @@ class BaseDiskCache : DiskCache {
         try {
             val os: OutputStream = BufferedOutputStream(FileOutputStream(tmpFile), bufferSize)
             try {
-                loaded = copyStream(imageStream,os,listener,bufferSize)
-            }finally {
-
+                loaded = copyStream(imageStream, os, listener, bufferSize)
+            } finally {
+                closeSilently(os)
             }
         } finally {
-
+            if (loaded && !tmpFile.renameTo(imageFile)) {
+                loaded = false
+            }
+            if (!loaded) {
+                tmpFile.delete()
+            }
         }
 
         return loaded
     }
 
-    override fun save(imageUrl: String, bitmap: Bitmap?): Boolean {
-        TODO("Not yet implemented")
+    override fun save(imageUrl: String, bitmap: Bitmap): Boolean {
+        val imageFile: File = getFile(imageUrl)
+        val tmpFile: File = File(imageFile.absolutePath + TEMP_IMAGE_POSTFIX)
+        val os = BufferedOutputStream(FileOutputStream(tmpFile), bufferSize)
+        var savedSuccessfully: Boolean = false
+        try {
+            savedSuccessfully = bitmap.compress(compressFormat, compressQuality, os)
+        } finally {
+            closeSilently(os)
+            if (savedSuccessfully && !tmpFile.renameTo(imageFile)) {
+                savedSuccessfully = false
+            }
+            if (!savedSuccessfully) {
+                tmpFile.delete()
+            }
+        }
+        return savedSuccessfully
     }
 
     override fun remove(imageUrl: String) = getFile(imageUrl).delete()

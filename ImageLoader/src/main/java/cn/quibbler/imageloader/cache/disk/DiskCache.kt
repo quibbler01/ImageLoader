@@ -39,7 +39,7 @@ interface DiskCache {
      * @throws java.io.IOException
      */
     @Throws(IOException::class)
-    fun save(imageUrl: String, imageStream: InputStream?, listener: CopyListener?): Boolean
+    fun save(imageUrl: String, imageStream: InputStream, listener: CopyListener): Boolean
 
     /**
      * Saves image bitmap in disk cache.
@@ -49,7 +49,7 @@ interface DiskCache {
      * @return <b>true</b> - if bitmap was saved successfully; <b>false</b> - if bitmap wasn't saved in disk cache.
      * @throws IOException
      */
-    fun save(imageUrl: String, bitmap: Bitmap?): Boolean
+    fun save(imageUrl: String, bitmap: Bitmap): Boolean
 
     /**
      * Removes image file associated with incoming URI
