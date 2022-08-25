@@ -24,7 +24,7 @@ interface DiskCache {
      * @param imageUri Original image URI
      * @return File of cached image or <b>null</b> if image wasn't cached
      */
-    fun get(imageUrl: String?): File?
+    fun get(imageUrl: String): File?
 
     /**
      * Saves image stream in disk cache.
@@ -39,7 +39,7 @@ interface DiskCache {
      * @throws java.io.IOException
      */
     @Throws(IOException::class)
-    fun save(imageUrl: String?, imageStream: InputStream?, listener: CopyListener?): Boolean
+    fun save(imageUrl: String, imageStream: InputStream?, listener: CopyListener?): Boolean
 
     /**
      * Saves image bitmap in disk cache.
@@ -49,7 +49,7 @@ interface DiskCache {
      * @return <b>true</b> - if bitmap was saved successfully; <b>false</b> - if bitmap wasn't saved in disk cache.
      * @throws IOException
      */
-    fun save(imageUrl: String?, bitmap: Bitmap?): Boolean
+    fun save(imageUrl: String, bitmap: Bitmap?): Boolean
 
     /**
      * Removes image file associated with incoming URI
@@ -58,7 +58,7 @@ interface DiskCache {
      * @return <b>true</b> - if image file is deleted successfully; <b>false</b> - if image file doesn't exist for
      * incoming URI or image file can't be deleted.
      */
-    fun remove(imageUrl: String?)
+    fun remove(imageUrl: String): Boolean
 
     /**
      * Closes disk cache, releases resources.
