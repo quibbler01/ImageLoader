@@ -10,7 +10,7 @@ import cn.quibbler.imageloader.utils.copyStream
 import java.io.*
 import java.util.*
 
-class BaseDiskCache : DiskCache {
+abstract class BaseDiskCache : DiskCache {
 
     companion object {
         const val DEFAULT_BUFFER_SIZE = 32 * 1024
@@ -51,7 +51,7 @@ class BaseDiskCache : DiskCache {
 
     override fun getDirectory(): File = cacheDir
 
-    override fun get(imageUrl: String): File = getFile(imageUrl)
+    override fun get(imageUrl: String): File? = getFile(imageUrl)
 
     override fun save(
         imageUrl: String,
