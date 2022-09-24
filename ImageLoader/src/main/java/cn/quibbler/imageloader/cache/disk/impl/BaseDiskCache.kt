@@ -10,11 +10,20 @@ import cn.quibbler.imageloader.utils.copyStream
 import java.io.*
 import java.util.*
 
+/**
+ * Base disk cache.
+ *
+ * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
+ * @see FileNameGenerator
+ * @since 1.0.0
+ */
 abstract class BaseDiskCache : DiskCache {
 
     companion object {
-        const val DEFAULT_BUFFER_SIZE = 32 * 1024
+        const val DEFAULT_BUFFER_SIZE = 32 * 1024 // 32 Kb
+
         const val DEFAULT_COMPRESS_QUALITY = 100
+
         val DEFAULT_COMPRESS_FORMAT = Bitmap.CompressFormat.PNG
 
         private const val ERROR_ARG_NULL = "argument must be not null"
@@ -29,14 +38,25 @@ abstract class BaseDiskCache : DiskCache {
     var compressFormat: Bitmap.CompressFormat = DEFAULT_COMPRESS_FORMAT
     var compressQuality: Int = DEFAULT_COMPRESS_QUALITY
 
+    /** @param cacheDir Directory for file caching */
     constructor(cacheDir: File?) : this(cacheDir, null)
 
+    /**
+     * @param cacheDir        Directory for file caching
+     * @param reserveCacheDir null-ok; Reserve directory for file caching. It's used when the primary directory isn't available.
+     */
     constructor(cacheDir: File?, reserveCacheDir: File?) : this(
         cacheDir,
         reserveCacheDir,
         DefaultConfigurationFactory.createFileNameGenerator()
     )
 
+    /**
+     * @param cacheDir          Directory for file caching
+     * @param reserveCacheDir   null-ok; Reserve directory for file caching. It's used when the primary directory isn't available.
+     * @param fileNameGenerator {@linkplain com.nostra13.universalimageloader.cache.disc.naming.FileNameGenerator
+     *                          Name generator} for cached files
+     */
     constructor(cacheDir: File?, reserveCacheDir: File?, fileNameGenerator: FileNameGenerator?) {
         if (cacheDir == null) {
             throw IllegalArgumentException("cacheDir $ERROR_ARG_NULL")
