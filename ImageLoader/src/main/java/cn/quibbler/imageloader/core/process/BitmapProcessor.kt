@@ -18,6 +18,6 @@ interface BitmapProcessor {
      * @param bitmap Original [Bitmap]
      * @return Processed [Bitmap]
      */
-    fun process(bitmap: Bitmap): Bitmap
+    fun process(bitmap: Bitmap): Bitmap?
 
 }
