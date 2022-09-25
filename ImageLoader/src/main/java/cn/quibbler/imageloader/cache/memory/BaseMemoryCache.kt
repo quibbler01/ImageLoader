@@ -5,8 +5,16 @@ import java.lang.ref.Reference
 import java.util.*
 import kotlin.collections.HashSet
 
+/**
+ * Base memory cache. Implements common functionality for memory cache. Provides object references (
+ * {@linkplain Reference not strong}) storing.
+ *
+ * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
+ * @since 1.0.0
+ */
 abstract class BaseMemoryCache : MemoryCache {
 
+    /** Stores not strong references to objects */
     private val softMap = Collections.synchronizedMap(HashMap<String, Reference<Bitmap>>())
 
     override fun put(key: String, value: Bitmap): Boolean {
@@ -38,6 +46,7 @@ abstract class BaseMemoryCache : MemoryCache {
         softMap.clear()
     }
 
+    /** Creates {@linkplain Reference not strong} reference of value */
     abstract fun createReference(value: Bitmap): Reference<Bitmap>
 
 }
