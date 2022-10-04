@@ -7,7 +7,10 @@ import java.io.IOException
 import java.io.InputStream
 
 /**
+ * Interface for disk cache
  *
+ * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
+ * @since 1.9.2
  */
 interface DiskCache {
 

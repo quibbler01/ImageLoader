@@ -8,7 +8,10 @@ private const val URI_AND_SIZE_SEPARATOR = "_"
 
 private const val WIDTH_AND_HEIGHT_SEPARATOR = "x"
 
-
+/**
+ * Generates key for memory cache for incoming image (URI + size).<br />
+ * Pattern for cache key - <b>[imageUri]_[width]x[height]</b>.
+ */
 fun generateKey(imageUri: String, targetSize: ImageSize): String {
     return StringBuilder(imageUri)
         .append(URI_AND_SIZE_SEPARATOR)
@@ -26,6 +29,12 @@ fun createFuzzyKeyComparator(): Comparator<String> {
     }
 }
 
+/**
+ * Searches all bitmaps in memory cache which are corresponded to incoming URI.<br />
+ * <b>Note:</b> Memory cache can contain multiple sizes of the same image if only you didn't set
+ * {@link ImageLoaderConfiguration.Builder#denyCacheImageMultipleSizesInMemory()
+ * denyCacheImageMultipleSizesInMemory()} option in {@linkplain ImageLoaderConfiguration configuration}
+ */
 fun findCachedBitmapsForImageUri(imageUri: String, memoryCache: MemoryCache): List<Bitmap?> {
     val list = ArrayList<Bitmap>()
     for (key in memoryCache.keys()) {
@@ -36,6 +45,12 @@ fun findCachedBitmapsForImageUri(imageUri: String, memoryCache: MemoryCache): Li
     return list
 }
 
+/**
+ * Searches all keys in memory cache which are corresponded to incoming URI.<br />
+ * <b>Note:</b> Memory cache can contain multiple sizes of the same image if only you didn't set
+ * {@link ImageLoaderConfiguration.Builder#denyCacheImageMultipleSizesInMemory()
+ * denyCacheImageMultipleSizesInMemory()} option in {@linkplain ImageLoaderConfiguration configuration}
+ */
 fun findCacheKeysForImageUri(imageUri: String, memoryCache: MemoryCache): List<String> {
     val list = ArrayList<String>()
     for (key in memoryCache.keys()) {
@@ -46,6 +61,12 @@ fun findCacheKeysForImageUri(imageUri: String, memoryCache: MemoryCache): List<S
     return list
 }
 
+/**
+ * Removes from memory cache all images for incoming URI.<br />
+ * <b>Note:</b> Memory cache can contain multiple sizes of the same image if only you didn't set
+ * {@link ImageLoaderConfiguration.Builder#denyCacheImageMultipleSizesInMemory()
+ * denyCacheImageMultipleSizesInMemory()} option in {@linkplain ImageLoaderConfiguration configuration}
+ */
 fun removeFromCache(imageUri: String, memoryCache: MemoryCache) {
     val keysToRemove = ArrayList<String>()
     for (key in memoryCache.keys()) {
