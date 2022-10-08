@@ -1,6 +1,6 @@
 package cn.quibbler.imageloader.core.assist
 
-class FailReason(public val type: FailType, public val cause: Throwable) {
+class FailReason(public val type: FailType, public val cause: Throwable?) {
 
     enum class FailType {
         IO_ERROR,
