@@ -7,7 +7,7 @@ import java.io.InputStream
  * Many streams obtained over slow connection show <a href="http://code.google.com/p/android/issues/detail?id=6066">this
  * problem</a>.
  */
-class FlushedInputStream(inputStream: InputStream) : FilterInputStream(inputStream) {
+class FlushedInputStream(inputStream: InputStream?) : FilterInputStream(inputStream) {
 
     override fun skip(n: Long): Long {
         var totalBytesSkipped = 0L
