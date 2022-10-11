@@ -1,18 +1,51 @@
 package cn.quibbler.imageloader.core.decode
 
-import android.graphics.BitmapFactory
 import android.graphics.BitmapFactory.Options
 import android.os.Build
+import cn.quibbler.imageloader.core.DisplayImageOptions
 import cn.quibbler.imageloader.core.assist.ImageScaleType
 import cn.quibbler.imageloader.core.assist.ImageSize
 import cn.quibbler.imageloader.core.assist.ViewScaleType
 import cn.quibbler.imageloader.core.download.ImageDownloader
 
-class ImageDecodingInfo(
-    val imageKey: String, val imageUrl: String, val originalImageUri: String,
-    val targetSize: ImageSize, val imageScaleType: ImageScaleType, val viewScaleType: ViewScaleType,
-    val downloader: ImageDownloader, val extraForDownloader: Any?, val considerExifParams: Boolean, val decodingOptions: Options
-) {
+/**
+ * Contains needed information for decoding image to Bitmap
+ *
+ * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
+ * @since 1.8.3
+ */
+class ImageDecodingInfo {
+
+    private val imageKey: String?
+    private val imageUri: String?
+    private val originalImageUri: String?
+    private val targetSize: ImageSize?
+
+    private var imageScaleType: ImageScaleType?
+    private val viewScaleType: ViewScaleType?
+
+    private val downloader: ImageDownloader?
+    private var extraForDownloader: Any?
+
+    private var considerExifParams: Boolean
+    private var decodingOptions: Options
+
+    constructor(
+        imageKey: String?, imageUri: String?, originalImageUri: String?, targetSize: ImageSize?, viewScaleType: ViewScaleType?,
+        downloader: ImageDownloader?, displayOptions: DisplayImageOptions
+    ) {
+        this.imageKey = imageKey
+        this.imageUri = imageUri
+        this.originalImageUri = originalImageUri
+        this.targetSize = targetSize
+        imageScaleType = displayOptions.imageScaleType
+        this.viewScaleType = viewScaleType
+        this.downloader = downloader
+        extraForDownloader = displayOptions.extraForDownloader
+        considerExifParams = displayOptions.considerExifParams
+        decodingOptions = Options()
+        copyOptions(displayOptions.decodingOptions, decodingOptions)
+    }
 
     private fun copyOptions(srcOptions: Options, destOptions: Options) {
         destOptions.inDensity = srcOptions.inDensity
