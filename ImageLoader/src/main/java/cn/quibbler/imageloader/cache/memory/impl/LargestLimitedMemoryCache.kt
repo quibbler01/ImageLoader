@@ -6,8 +6,24 @@ import java.lang.ref.Reference
 import java.lang.ref.WeakReference
 import java.util.*
 
+/**
+ * Limited {@link Bitmap bitmap} cache. Provides {@link Bitmap bitmaps} storing. Size of all stored bitmaps will not to
+ * exceed size limit. When cache reaches limit size then the bitmap which has the largest size is deleted from
+ * cache.<br />
+ * <br />
+ * <b>NOTE:</b> This cache uses strong and weak references for stored Bitmaps. Strong references - for limited count of
+ * Bitmaps (depends on cache size), weak references - for all other cached Bitmaps.
+ *
+ * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
+ * @since 1.0.0
+ */
 class LargestLimitedMemoryCache : LimitedMemoryCache {
 
+    /**
+     * Contains strong references to stored objects (keys) and sizes of the objects. If hard cache
+     * size will exceed limit then object with the largest size is deleted (but it continue exist at
+     * {@link #softMap} and can be collected by GC at any time)
+     */
     private val valueSizes = Collections.synchronizedMap(HashMap<Bitmap, Int>())
 
     constructor(sizeLimit: Int) : super(sizeLimit)
