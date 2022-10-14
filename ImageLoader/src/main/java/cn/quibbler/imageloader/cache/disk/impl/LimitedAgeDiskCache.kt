@@ -8,14 +8,30 @@ import java.io.File
 import java.io.InputStream
 import java.util.*
 
+/**
+ * Cache which deletes files which were loaded more than defined time. Cache size is unlimited.
+ *
+ * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
+ * @since 1.3.1
+ */
 class LimitedAgeDiskCache : BaseDiskCache {
 
     private var maxFileAge: Long
 
     private val loadingDates = Collections.synchronizedMap(HashMap<File, Long>())
 
+    /**
+     * @param cacheDir Directory for file caching
+     * @param maxAge   Max file age (in seconds). If file age will exceed this value then it'll be removed on next
+     *                 treatment (and therefore be reloaded).
+     */
     constructor(cacheDir: File, maxAge: Long) : this(cacheDir, null, maxAge)
 
+    /**
+     * @param cacheDir Directory for file caching
+     * @param maxAge   Max file age (in seconds). If file age will exceed this value then it'll be removed on next
+     *                 treatment (and therefore be reloaded).
+     */
     constructor(cacheDir: File, reserveCacheDir: File?, maxAge: Long) : this(
         cacheDir,
         reserveCacheDir,
@@ -23,13 +39,20 @@ class LimitedAgeDiskCache : BaseDiskCache {
         maxAge
     )
 
+    /**
+     * @param cacheDir          Directory for file caching
+     * @param reserveCacheDir   null-ok; Reserve directory for file caching. It's used when the primary directory isn't available.
+     * @param fileNameGenerator Name generator for cached files
+     * @param maxAge            Max file age (in seconds). If file age will exceed this value then it'll be removed on next
+     *                          treatment (and therefore be reloaded).
+     */
     constructor(
         cacheDir: File,
         reserveCacheDir: File?,
         fileNameGenerator: FileNameGenerator?,
         maxAge: Long
     ) : super(cacheDir, reserveCacheDir, fileNameGenerator) {
-        this.maxFileAge = maxAge * 1000
+        this.maxFileAge = maxAge * 1000 // to milliseconds
     }
 
     override fun get(imageUrl: String): File? {
