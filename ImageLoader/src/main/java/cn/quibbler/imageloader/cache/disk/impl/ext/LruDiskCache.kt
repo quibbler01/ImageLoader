@@ -12,10 +12,19 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 
+/**
+ * Disk cache based on "Least-Recently Used" principle. Adapter pattern, adapts
+ * {@link com.nostra13.universalimageloader.cache.disc.impl.ext.DiskLruCache DiskLruCache} to
+ * {@link com.nostra13.universalimageloader.cache.disc.DiskCache DiskCache}
+ *
+ * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
+ * @see FileNameGenerator
+ * @since 1.9.2
+ */
 class LruDiskCache : DiskCache {
 
     companion object {
-        const val DEFAULT_BUFFER_SIZE = 32 * 1024
+        const val DEFAULT_BUFFER_SIZE = 32 * 1024 // 32 Kb
 
         val DEFAULT_COMPRESS_FORMAT = Bitmap.CompressFormat.PNG
 
@@ -37,9 +46,27 @@ class LruDiskCache : DiskCache {
 
     var compressQuality: Int = DEFAULT_COMPRESS_QUALITY
 
+    /**
+     * @param cacheDir          Directory for file caching
+     * @param fileNameGenerator {@linkplain com.nostra13.universalimageloader.cache.disc.naming.FileNameGenerator
+     *                          Name generator} for cached files. Generated names must match the regex
+     *                          <strong>[a-z0-9_-]{1,64}</strong>
+     * @param cacheMaxSize      Max cache size in bytes. <b>0</b> means cache size is unlimited.
+     * @throws IOException if cache can't be initialized (e.g. "No space left on device")
+     */
     @Throws(IOException::class)
     constructor(cacheDir: File, fileNameGenerator: FileNameGenerator, cacheMaxSize: Long) : this(cacheDir, null, fileNameGenerator, cacheMaxSize, 0)
 
+    /**
+     * @param cacheDir          Directory for file caching
+     * @param reserveCacheDir   null-ok; Reserve directory for file caching. It's used when the primary directory isn't available.
+     * @param fileNameGenerator {@linkplain com.nostra13.universalimageloader.cache.disc.naming.FileNameGenerator
+     *                          Name generator} for cached files. Generated names must match the regex
+     *                          <strong>[a-z0-9_-]{1,64}</strong>
+     * @param cacheMaxSize      Max cache size in bytes. <b>0</b> means cache size is unlimited.
+     * @param cacheMaxFileCount Max file count in cache. <b>0</b> means file count is unlimited.
+     * @throws IOException if cache can't be initialized (e.g. "No space left on device")
+     */
     @Throws(IOException::class)
     constructor(cacheDir: File?, reserveCacheDir: File?, fileNameGenerator: FileNameGenerator?, cacheMaxSize: Long, cacheMaxFileCount: Int) {
         if (cacheDir == null) {
@@ -79,7 +106,7 @@ class LruDiskCache : DiskCache {
                 initCache(reserveCacheDir, null, cacheMaxSize, cacheMaxFileCount)
             }
             if (cache == null) {
-                throw e
+                throw e //new RuntimeException("Can't initialize disk cache", e);
             }
         }
     }
