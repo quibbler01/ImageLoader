@@ -5,11 +5,17 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
+/**
+ * Names image file as MD5 hash of image URI
+ *
+ * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
+ * @since 1.4.0
+ */
 class Md5FileNameGenerator : FileNameGenerator {
 
     companion object {
         const val HASH_ALGORITHM = "MD5"
-        const val RADIX = 10 + 26
+        const val RADIX = 10 + 26 // 10 digits + 26 letters
     }
 
     override fun generate(imageUrl: String): String {
