@@ -4,7 +4,20 @@ import android.graphics.Bitmap
 import cn.quibbler.imageloader.cache.memory.MemoryCache
 import kotlin.math.max
 
-class LruMemoryCache(private val maxSize: Int) : MemoryCache {
+/**
+ * A cache that holds strong references to a limited number of Bitmaps. Each time a Bitmap is accessed, it is moved to
+ * the head of a queue. When a Bitmap is added to a full cache, the Bitmap at the end of that queue is evicted and may
+ * become eligible for garbage collection.<br />
+ * <br />
+ * <b>NOTE:</b> This cache uses only strong references for stored Bitmaps.
+ *
+ * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
+ * @since 1.8.1
+ */
+class LruMemoryCache(
+    /** Size of this cache in bytes */
+    private val maxSize: Int
+) : MemoryCache {
 
     init {
         if (maxSize <= 0) {
@@ -28,12 +41,17 @@ class LruMemoryCache(private val maxSize: Int) : MemoryCache {
         return true
     }
 
+    /**
+     * Returns the Bitmap for {@code key} if it exists in the cache. If a Bitmap was returned, it is moved to the head
+     * of the queue. This returns null if a Bitmap is not cached.
+     */
     override fun get(key: String): Bitmap? {
         synchronized(this) {
             return map[key]
         }
     }
 
+    /** Removes the entry for {@code key} if it exists. */
     override fun remove(key: String): Bitmap? {
         synchronized(this) {
             val previous = map.remove(key)
@@ -51,9 +69,14 @@ class LruMemoryCache(private val maxSize: Int) : MemoryCache {
     }
 
     override fun clear() {
-        trimToSize(-1)
+        trimToSize(-1) // -1 will evict 0-sized elements
     }
 
+    /**
+     * Remove the eldest entries until the total of remaining entries is at or below the requested size.
+     *
+     * @param maxSize the maximum size of the cache before returning. May be -1 to evict even 0-sized elements.
+     */
     private fun trimToSize(maxSize: Int) {
         while (true) {
             var key: String? = null
@@ -78,6 +101,11 @@ class LruMemoryCache(private val maxSize: Int) : MemoryCache {
         }
     }
 
+    /**
+     * Returns the size {@code Bitmap} in bytes.
+     * <p/>
+     * An entry's size must not change while it is in the cache.
+     */
     private fun sizeOf(value: Bitmap?): Int = if (value != null) {
         value.rowBytes * value.height
     } else {
