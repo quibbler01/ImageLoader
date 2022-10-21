@@ -3,25 +3,29 @@ package cn.quibbler.imageloader.cache.disk.impl.ext
 import java.io.*
 import java.nio.charset.Charset
 
+/**
+ * Buffers input from an {@link InputStream} for reading lines.
+ *
+ * <p>This class is used for buffered reading of lines. For purposes of this class, a line ends
+ * with "\n" or "\r\n". End of input is reported by throwing {@code EOFException}. Unterminated
+ * line at end of input is invalid and will be ignored, the caller may use {@code
+ * hasUnterminatedLine()} to detect it after catching the {@code EOFException}.
+ *
+ * <p>This class is intended for reading input that strictly consists of lines, such as line-based
+ * cache entries or cache journal. Unlike the {@link java.io.BufferedReader} which in conjunction
+ * with {@link java.io.InputStreamReader} provides similar functionality, this class uses different
+ * end-of-input reporting and a more restrictive definition of a line.
+ *
+ * <p>This class supports only charsets that encode '\r' and '\n' as a single byte with value 13
+ * and 10, respectively, and the representation of no other character contains these values.
+ * We currently check in constructor that the charset is one of US-ASCII, UTF-8 and ISO-8859-1.
+ * The default charset is US_ASCII.
+ */
 class StrictLineReader : Closeable {
 
     companion object {
         private const val CR = '\r'.code.toByte()
         private const val LF = '\n'.code.toByte()
-    }
-
-    constructor(input: InputStream, charset: Charset) : this(input = input, capacity = 8192, charset = charset)
-
-    constructor(input: InputStream, capacity: Int, charset: Charset) {
-        if (capacity < 0) {
-            throw IllegalArgumentException("capacity <= 0")
-        }
-        if (charset != US_ASCII) {
-            throw IllegalArgumentException("Unsupported encoding")
-        }
-        this.input = input
-        this.charset = charset
-        this.buf = ByteArray(capacity)
     }
 
     private val input: InputStream
@@ -37,12 +41,60 @@ class StrictLineReader : Closeable {
     private var pos = 0
     private var end = 0
 
+    /**
+     * Constructs a new {@code LineReader} with the specified charset and the default capacity.
+     *
+     * @param in the {@code InputStream} to read data from.
+     * @param charset the charset used to decode data. Only US-ASCII, UTF-8 and ISO-8859-1 are
+     * supported.
+     * @throws NullPointerException if {@code in} or {@code charset} is null.
+     * @throws IllegalArgumentException if the specified charset is not supported.
+     */
+    constructor(input: InputStream, charset: Charset) : this(input = input, capacity = 8192, charset = charset)
+
+    /**
+     * Constructs a new {@code LineReader} with the specified capacity and charset.
+     *
+     * @param in the {@code InputStream} to read data from.
+     * @param capacity the capacity of the buffer.
+     * @param charset the charset used to decode data. Only US-ASCII, UTF-8 and ISO-8859-1 are
+     * supported.
+     * @throws NullPointerException if {@code in} or {@code charset} is null.
+     * @throws IllegalArgumentException if {@code capacity} is negative or zero
+     * or the specified charset is not supported.
+     */
+    constructor(input: InputStream, capacity: Int, charset: Charset) {
+        if (capacity < 0) {
+            throw IllegalArgumentException("capacity <= 0")
+        }
+        if (charset != US_ASCII) {
+            throw IllegalArgumentException("Unsupported encoding")
+        }
+        this.input = input
+        this.charset = charset
+        this.buf = ByteArray(capacity)
+    }
+
+    /**
+     * Closes the reader by closing the underlying {@code InputStream} and
+     * marking this reader as closed.
+     *
+     * @throws IOException for errors when closing the underlying {@code InputStream}.
+     */
     override fun close() {
         synchronized(input) {
             input.close()
         }
     }
 
+    /**
+     * Reads the next line. A line ends with {@code "\n"} or {@code "\r\n"},
+     * this end of line marker is not included in the result.
+     *
+     * @return the next line from the input.
+     * @throws IOException for underlying {@code InputStream} errors.
+     * @throws EOFException for the end of source stream.
+     */
     @Throws(IOException::class)
     fun readLine(): String {
         synchronized(input) {
@@ -94,6 +146,10 @@ class StrictLineReader : Closeable {
         }
     }
 
+    /**
+     * Reads new input data into the buffer. Call only with pos == end or end == -1,
+     * depending on the desired outcome if the function throws.
+     */
     @Throws(IOException::class)
     private fun fillBuf() {
         val result = input.read(buf, 0, buf.size)
