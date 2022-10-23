@@ -7,12 +7,29 @@ import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.HashMap
 
+/**
+ * Limited {@link Bitmap bitmap} cache. Provides {@link Bitmap bitmaps} storing. Size of all stored bitmaps will not to
+ * exceed size limit. When cache reaches limit size then the bitmap which used the least frequently is deleted from
+ * cache.<br />
+ * <br />
+ * <b>NOTE:</b> This cache uses strong and weak references for stored Bitmaps. Strong references - for limited count of
+ * Bitmaps (depends on cache size), weak references - for all other cached Bitmaps.
+ *
+ * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
+ * @since 1.0.0
+ */
 class UsingFreqLimitedMemoryCache(sizeLimit: Int) : LimitedMemoryCache(sizeLimit) {
 
+    /**
+     * Contains strong references to stored objects (keys) and last object usage date (in milliseconds). If hard cache
+     * size will exceed limit then object with the least frequently usage is deleted (but it continue exist at
+     * {@link #softMap} and can be collected by GC at any time)
+     */
     private val usingCounts = Collections.synchronizedMap(HashMap<Bitmap, Int>())
 
     override fun get(key: String): Bitmap? {
         val value = super.get(key)
+        // Increment usage count for value if value is contained in hardCahe
         value?.let {
             val usageCount = usingCounts.get(value)
             if (usageCount != null) {
