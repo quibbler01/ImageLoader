@@ -6,6 +6,8 @@ import java.lang.RuntimeException
 import java.nio.charset.Charset
 import kotlin.jvm.Throws
 
+/** Junk drawer of utility methods. */
+
 val US_ASCII = Charset.forName("US-ASCII")
 
 val UTF_8 = Charset.forName("UTF-8")
@@ -25,6 +27,10 @@ fun readFully(reader: Reader): String {
     }
 }
 
+/**
+ * Deletes the contents of {@code dir}. Throws an IOException if any file
+ * could not be deleted, or if {@code dir} is not a readable directory.
+ */
 @Throws(IOException::class)
 fun deleteContents(dir: File) {
     val files = dir.listFiles() ?: throw IOException("not a readable directory:$dir")
@@ -39,7 +45,7 @@ fun deleteContents(dir: File) {
 }
 
 @Throws(RuntimeException::class)
-fun closeQuietly(closeable: Closeable?) {
+fun closeQuietly(/*Auto*/ closeable: Closeable?) {
     closeable?.let {
         try {
             it.close()
