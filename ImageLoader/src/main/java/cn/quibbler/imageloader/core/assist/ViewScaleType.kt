@@ -9,26 +9,26 @@ enum class ViewScaleType {
 
     CROP;
 
-    fun fromImageView(imageView: ImageView): ViewScaleType {
-        return when (imageView.scaleType) {
-            ImageView.ScaleType.FIT_CENTER,
-            ImageView.ScaleType.FIT_XY,
-            ImageView.ScaleType.FIT_START,
-            ImageView.ScaleType.FIT_END,
-            ImageView.ScaleType.CENTER_INSIDE,
-            -> {
-                FIT_INSIDE
-            }
-            ImageView.ScaleType.MATRIX,
-            ImageView.ScaleType.CENTER,
-            ImageView.ScaleType.CENTER_CROP,
-            -> {
-                CROP
-            }
-            else -> {
-                CROP
-            }
+}
+
+fun fromImageView(imageView: ImageView): ViewScaleType {
+    return when (imageView.scaleType) {
+        ImageView.ScaleType.FIT_CENTER,
+        ImageView.ScaleType.FIT_XY,
+        ImageView.ScaleType.FIT_START,
+        ImageView.ScaleType.FIT_END,
+        ImageView.ScaleType.CENTER_INSIDE,
+        -> {
+            ViewScaleType.FIT_INSIDE
+        }
+        ImageView.ScaleType.MATRIX,
+        ImageView.ScaleType.CENTER,
+        ImageView.ScaleType.CENTER_CROP,
+        -> {
+            ViewScaleType.CROP
+        }
+        else -> {
+            ViewScaleType.CROP
         }
     }
-
 }
